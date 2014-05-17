@@ -29,6 +29,25 @@
     </dependencies>
 
     <build>
+        <directory>target</directory>
+            <outputDirectory>target/classes</outputDirectory>
+            <finalName>weblog</finalName>
+            <testOutputDirectory>target/test-classes</testOutputDirectory>
+            <sourceDirectory>src/main/java</sourceDirectory>
+            <resources>
+                <resource>
+                        <directory>src/main/resources</directory>
+                        <excludes>
+                                <exclude>com/**</exclude>
+                        </excludes>
+                </resource>
+                <resource>
+                        <directory>src/main/java</directory>
+                        <excludes>
+                                <exclude>**/*.java</exclude>
+                        </excludes>
+                </resource>
+            </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -45,7 +64,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>2.3</version>
+                <version>2.4</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                 </configuration>
@@ -53,29 +72,48 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.6</version>
                 <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${endorsed.dir}</outputDirectory>
-                            <silent>true</silent>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>javax</groupId>
-                                    <artifactId>javaee-endorsed-api</artifactId>
-                                    <version>7.0</version>
-                                    <type>jar</type>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
+                        <execution>
+                                <phase>install</phase>
+                                <goals>
+                                        <goal>copy-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                        <excludeArtifactIds>
+                                            servlet-api
+                                        </excludeArtifactIds>
+                                </configuration>
+                        </execution>
+                        <execution>
+                                <id>unpack-dependencies</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                        <goal>unpack-dependencies</goal>
+                                </goals>
+                                <configuration>
+                                        <includeGroupIds>
+                                            org.masque.weblog
+                                        </includeGroupIds>
+                                        <includes>
+                                            META-INF/resources/**/*
+                                        </includes>
+                                        <excludes>
+                                            **/*.class
+                                        </excludes>
+                                        <outputDirectory>
+                                            ${project.build.directory}/weblog
+                                        </outputDirectory>
+                                        <overWriteReleases>
+                                            true 
+                                        </overWriteReleases>
+                                        <overWriteSnapshots>
+                                            true
+                                        </overWriteSnapshots>
+                                </configuration>
+                        </execution>
                 </executions>
             </plugin>
-        </plugins>
+           </plugins>
     </build>
 
 </project>
